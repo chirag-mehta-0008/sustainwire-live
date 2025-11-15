@@ -5,8 +5,6 @@ const path = require('path');
 const session = require('express-session');
 const mongoose = require('mongoose');
 const multer = require('multer'); // File upload package
-
-// YEH NAYA ADD HUA HAI (Cloudinary)
 const cloudinary = require('cloudinary').v2;
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
 
@@ -25,27 +23,23 @@ const SpecialReport = require('./models/SpecialReport');
 const app = express();
 const PORT = process.env.PORT || 3000; // Render ka port use karne ke liye
 
-// --- YEH NAYA ADD HUA HAI (Cloudinary Configuration) ---
-// Yeh keys .env file (ya Render Environment Variables) se aayengi
+// --- Cloudinary Configuration ---
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
-// Naya Cloudinary Storage Engine
+// Cloudinary Storage Engine
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
-    folder: 'sustainwire-uploads', // Cloudinary mein folder ka naam
-    format: async (req, file) => 'jpg', // Sab images ko jpg bana do
-    public_id: (req, file) => Date.now() + '-' + file.originalname, // Unique naam
+    folder: 'sustainwire-uploads', 
+    format: async (req, file) => 'jpg',
+    public_id: (req, file) => Date.now() + '-' + file.originalname,
   },
 });
 
-// Purana diskStorage hata diya gaya hai
-// const upload = multer({ storage: diskStorage });
-// Naya Multer setup
 const upload = multer({ storage: storage });
 
 
@@ -55,9 +49,8 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Session Middleware
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'sustainwire-super-secret-key', // Secret key
+  secret: process.env.SESSION_SECRET || 'sustainwire-super-secret-key', 
   resave: false,
   saveUninitialized: false,
   cookie: { maxAge: 1000 * 60 * 60 * 24 } // 1 din
@@ -73,18 +66,17 @@ const users = [
 // --- Middleware (Admin Routes ko Protect karne ke liye) ---
 const isAdmin = (req, res, next) => {
   if (req.session.isLoggedIn) {
-    res.locals.username = req.session.username; // Username ko saare admin pages par bhejo
+    res.locals.username = req.session.username; 
     return next();
   }
   res.redirect('/login');
 };
 
-// --- PUBLIC ROUTES (Jo sabko dikhega) ---
+// --- PUBLIC ROUTES ---
 
 // Homepage Route
 app.get('/', async (req, res) => {
     try {
-        // Data ko MongoDB se fetch karo
         const specialReport = await SpecialReport.findOne();
         const newsArticles = await News.find().sort({ _id: -1 }).limit(3);
         const esgJobs = await Job.find().sort({ _id: -1 }).limit(10);
@@ -97,7 +89,8 @@ app.get('/', async (req, res) => {
             news: newsArticles,
             jobs: esgJobs,
             events: upcomingEvents,
-            courses: featuredCourses
+            courses: featuredCourses,
+            username: req.session.username || null // Public pages par bhi username bhejo (taaki header mein login/logout dikha sakein)
         });
     } catch (err) {
         console.error(err);
@@ -105,77 +98,73 @@ app.get('/', async (req, res) => {
     }
 });
 
-// List Pages (News, Jobs, Events, Courses)
+// List Pages
 app.get('/news', async (req, res) => {
     const allNews = await News.find().sort({ _id: -1 });
-    res.render('news-list', { pageTitle: "All News", news: allNews });
+    res.render('news-list', { pageTitle: "All News", news: allNews, username: req.session.username || null });
 });
 app.get('/jobs', async (req, res) => {
     const allJobs = await Job.find().sort({ _id: -1 });
-    res.render('jobs-list', { pageTitle: "All Jobs", jobs: allJobs });
+    res.render('jobs-list', { pageTitle: "All Jobs", jobs: allJobs, username: req.session.username || null });
 });
 app.get('/events', async (req, res) => {
     const allEvents = await Event.find().sort({ _id: -1 });
-    res.render('events-list', { pageTitle: "All Events", events: allEvents });
+    res.render('events-list', { pageTitle: "All Events", events: allEvents, username: req.session.username || null });
 });
 app.get('/courses', async (req, res) => {
     const allCourses = await Course.find().sort({ _id: -1 });
-    res.render('courses-list', { pageTitle: "All Courses", courses: allCourses });
+    res.render('courses-list', { pageTitle: "All Courses", courses: allCourses, username: req.session.username || null });
 });
 
-// Detail Pages (News, Jobs, Events, Courses, Report)
+// Detail Pages
 app.get('/news/:id', async (req, res) => {
     const article = await News.findById(req.params.id);
     if (!article) return res.redirect('/news');
-    res.render('news-detail', { pageTitle: article.title, article: article });
+    res.render('news-detail', { pageTitle: article.title, article: article, username: req.session.username || null });
 });
 app.get('/job/:id', async (req, res) => {
     const job = await Job.findById(req.params.id);
     if (!job) return res.redirect('/jobs');
-    res.render('job-detail', { pageTitle: job.title, job: job });
+    res.render('job-detail', { pageTitle: job.title, job: job, username: req.session.username || null });
 });
 app.get('/event/:id', async (req, res) => {
     const event = await Event.findById(req.params.id);
     if (!event) return res.redirect('/events');
-    res.render('event-detail', { pageTitle: event.title, event: event });
+    res.render('event-detail', { pageTitle: event.title, event: event, username: req.session.username || null });
 });
 app.get('/course/:id', async (req, res) => {
     const course = await Course.findById(req.params.id);
     if (!course) return res.redirect('/courses');
-    res.render('course-detail', { pageTitle: course.title, course: course });
+    res.render('course-detail', { pageTitle: course.title, course: course, username: req.session.username || null });
 });
 app.get('/special-report', async (req, res) => {
     const report = await SpecialReport.findOne();
     if (!report) return res.redirect('/');
-    res.render('report-detail', { pageTitle: report.title, report: report });
+    res.render('report-detail', { pageTitle: report.title, report: report, username: req.session.username || null });
 });
 
 
 // --- AUTHENTICATION ROUTES ---
 
-// Login Page (Dikhana)
 app.get('/login', (req, res) => {
   if (req.session.isLoggedIn) {
     return res.redirect('/admin/dashboard');
   }
-  res.render('login', { pageTitle: "Admin Login", error: null });
+  res.render('login', { pageTitle: "Admin Login", error: null, username: req.session.username || null });
 });
 
-// Login (Submit Karna)
 app.post('/login', (req, res) => {
     const { username, password } = req.body;
     const user = users.find(u => u.username === username && u.password === password);
-
     if (user) {
         req.session.isLoggedIn = true;
         req.session.username = user.username;
         res.redirect('/admin/dashboard');
     } else {
-        res.render('login', { pageTitle: "Admin Login", error: "Invalid username or password" });
+        res.render('login', { pageTitle: "Admin Login", error: "Invalid username or password", username: req.session.username || null });
     }
 });
 
-// Logout
 app.get('/logout', (req, res) => {
     req.session.destroy(err => {
         res.redirect('/');
@@ -183,56 +172,46 @@ app.get('/logout', (req, res) => {
 });
 
 
-// --- ADMIN ROUTES (Protected by 'isAdmin' middleware) ---
+// --- ADMIN ROUTES (Protected) ---
 
-// Admin Dashboard
 app.get('/admin/dashboard', isAdmin, async (req, res) => {
     const news = await News.find().sort({ _id: -1 });
     const jobs = await Job.find().sort({ _id: -1 });
     const events = await Event.find().sort({ _id: -1 });
     const courses = await Course.find().sort({ _id: -1 });
-
     res.render('admin/dashboard', {
         pageTitle: "Admin Dashboard",
-        news: news,
-        jobs: jobs,
-        events: events,
-        courses: courses
+        news: news, jobs: jobs, events: events, courses: courses
     });
 });
 
 // --- SPECIAL REPORT CRUD (Admin) ---
 app.get('/admin/special-report/edit', isAdmin, async (req, res) => {
     let report = await SpecialReport.findOne();
-    // Agar report exist nahi karti, toh ek nayi empty report banao
     if (!report) {
         report = new SpecialReport({ 
             title: "Default Title", 
             content: "Default Content", 
             imageUrl: "https://placehold.co/800x600/e2e8f0/334155?text=Default+Image",
-            updatedBy: "Admin"
+            updatedBy: "Admin",
+            applyLink: "#"
         });
-        await report.save(); // Database mein save karo
+        await report.save();
     }
     res.render('admin/edit-special-report', { pageTitle: "Edit Special Report", report: report });
 });
 
-// YEH UPDATE HUA HAI (Cloudinary)
 app.post('/admin/special-report/edit', isAdmin, upload.single('imageUrl'), async (req, res) => {
     try {
         const { title, content, applyLink } = req.body;
         let report = await SpecialReport.findOne();
-        
         report.title = title;
         report.content = content;
         report.applyLink = applyLink;
-        report.updatedBy = req.session.username; // User ka naam save karo
-
-        // Agar nayi file upload hui hai
+        report.updatedBy = req.session.username;
         if (req.file) {
-            report.imageUrl = req.file.path; // Cloudinary ka URL save karo
+            report.imageUrl = req.file.path; // Cloudinary URL
         }
-        
         await report.save();
         res.redirect('/admin/dashboard');
     } catch (err) {
@@ -246,7 +225,6 @@ app.get('/admin/news/add', isAdmin, (req, res) => {
     res.render('admin/add-news', { pageTitle: "Add New Article" });
 });
 
-// YEH UPDATE HUA HAI (Cloudinary)
 app.post('/admin/news/add', isAdmin, upload.single('imageUrl'), async (req, res) => {
     try {
         const { title, content, category } = req.body;
@@ -254,8 +232,8 @@ app.post('/admin/news/add', isAdmin, upload.single('imageUrl'), async (req, res)
             title: title,
             content: content,
             category: category,
-            imageUrl: req.file.path, // Cloudinary ka URL save karo
-            updatedBy: req.session.username, // User ka naam
+            imageUrl: req.file.path, // Cloudinary URL
+            updatedBy: req.session.username,
         });
         await newArticle.save();
         res.redirect('/admin/dashboard');
@@ -271,22 +249,17 @@ app.get('/admin/news/edit/:id', isAdmin, async (req, res) => {
     res.render('admin/edit-news', { pageTitle: "Edit Article", article: article });
 });
 
-// YEH UPDATE HUA HAI (Cloudinary)
 app.post('/admin/news/edit/:id', isAdmin, upload.single('imageUrl'), async (req, res) => {
     try {
         const { title, content, category } = req.body;
         const article = await News.findById(req.params.id);
-        
         article.title = title;
         article.content = content;
         article.category = category;
         article.updatedBy = req.session.username;
-
-        // Agar nayi file upload hui hai
         if (req.file) {
-            article.imageUrl = req.file.path; // Cloudinary ka URL save karo
+            article.imageUrl = req.file.path; // Cloudinary URL
         }
-        
         await article.save();
         res.redirect('/admin/dashboard');
     } catch (err) {
@@ -311,7 +284,6 @@ app.post('/admin/jobs/add', isAdmin, async (req, res) => {
         let typeColor = 'green';
         if (type === 'Contract') typeColor = 'blue';
         if (type === 'Internship') typeColor = 'yellow';
-
         const newJob = new Job({
             title, company, location, type, description, applyLink, typeColor,
             updatedBy: req.session.username
@@ -334,10 +306,12 @@ app.post('/admin/jobs/edit/:id', isAdmin, async (req, res) => {
     try {
         const { title, company, location, type, description, applyLink } = req.body;
         const job = await Job.findById(req.params.id);
-
         let typeColor = 'green';
         if (type === 'Contract') typeColor = 'blue';
-        if (type ===SustainWire Server (Cloudinary Integrated):server.js === 'Internship') typeColor = 'yellow';
+        
+        // YEH WOH LINE HAI JO GALAT THI
+        if (type === 'Internship') typeColor = 'yellow'; 
+        // WOH 'SustainWire Server...' WALA TEXT HATA DIYA HAI
 
         job.title = title;
         job.company = company;
@@ -347,7 +321,6 @@ app.post('/admin/jobs/edit/:id', isAdmin, async (req, res) => {
         job.applyLink = applyLink;
         job.typeColor = typeColor;
         job.updatedBy = req.session.username;
-
         await job.save();
         res.redirect('/admin/dashboard');
     } catch (err) {
@@ -391,14 +364,12 @@ app.post('/admin/events/edit/:id', isAdmin, async (req, res) => {
     try {
         const { title, date, location, description, applyLink } = req.body;
         const event = await Event.findById(req.params.id);
-
         event.title = title;
         event.date = date;
         event.location = location;
         event.description = description;
         event.applyLink = applyLink;
         event.updatedBy = req.session.username;
-
         await event.save();
         res.redirect('/admin/dashboard');
     } catch (err) {
@@ -442,14 +413,12 @@ app.post('/admin/courses/edit/:id', isAdmin, async (req, res) => {
     try {
         const { title, provider, format, description, applyLink } = req.body;
         const course = await Course.findById(req.params.id);
-
         course.title = title;
         course.provider = provider;
         course.format = format;
         course.description = description;
         course.applyLink = applyLink;
         course.updatedBy = req.session.username;
-
         await course.save();
         res.redirect('/admin/dashboard');
     } catch (err) {
@@ -469,21 +438,26 @@ app.get('/admin/analytics/:type/:id', isAdmin, async (req, res) => {
     const { type, id } = req.params;
     let item;
     
-    // Model ko type ke hisaab se chuno
-    if (type === 'news') item = await News.findById(id);
-    if (type === 'job') item = await Job.findById(id);
-    if (type === 'event') item = await Event.findById(id);
-    if (type === 'course') item = await Course.findById(id);
-    if (type === 'special-report') item = await SpecialReport.findOne();
-
-    if (!item) return res.redirect('/admin/dashboard');
-    
-    res.render('admin/analytics-detail', {
-        pageTitle: `Analytics: ${item.title}`,
-        item: item,
-        analytics: item.analytics, // Analytics object ko pass karo
-        type: type
-    });
+    try {
+        if (type === 'news') item = await News.findById(id);
+        else if (type === 'job') item = await Job.findById(id);
+        else if (type === 'event') item = await Event.findById(id);
+        else if (type === 'course') item = await Course.findById(id);
+        else if (type === 'special-report') item = await SpecialReport.findOne();
+        else return res.redirect('/admin/dashboard');
+        
+        if (!item) return res.redirect('/admin/dashboard');
+        
+        res.render('admin/analytics-detail', {
+            pageTitle: `Analytics: ${item.title}`,
+            item: item,
+            analytics: item.analytics,
+            type: type
+        });
+    } catch (err) {
+        console.error(err);
+        res.redirect('/admin/dashboard');
+    }
 });
 
 
@@ -491,3 +465,4 @@ app.get('/admin/analytics/:type/:id', isAdmin, async (req, res) => {
 app.listen(PORT, () => {
     console.log(`Server http://localhost:${PORT} par chal raha hai`);
 });
+```
