@@ -1,16 +1,16 @@
 // --- Imports ---
-require('dotenv').config(); // .env file ko load karne ke liye (Sabse upar rakhein)
+require('dotenv').config(); 
 const express = require('express');
 const path = require('path');
 const session = require('express-session');
 const mongoose = require('mongoose');
-const multer = require('multer'); // File upload package
+const multer = require('multer'); 
 const cloudinary = require('cloudinary').v2;
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
 
 // --- Database Connection ---
 const connectDB = require('./config/database');
-connectDB(); // Database se connect karo
+connectDB(); 
 
 // --- Models ko import karna ---
 const News = require('./models/News');
@@ -21,7 +21,7 @@ const SpecialReport = require('./models/SpecialReport');
 
 // --- App Setup ---
 const app = express();
-const PORT = process.env.PORT || 3000; // Render ka port use karne ke liye
+const PORT = process.env.PORT || 3000; 
 
 // --- Cloudinary Configuration ---
 cloudinary.config({
@@ -30,7 +30,6 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
-// Cloudinary Storage Engine
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
@@ -53,10 +52,10 @@ app.use(session({
   secret: process.env.SESSION_SECRET || 'sustainwire-super-secret-key', 
   resave: false,
   saveUninitialized: false,
-  cookie: { maxAge: 1000 * 60 * 60 * 24 } // 1 din
+  cookie: { maxAge: 1000 * 60 * 60 * 24 } 
 }));
 
-// --- User Database (Simple Array) ---
+// --- User Database ---
 const users = [
     { id: 1, username: "Chirag.Mehta", password: "Chirag@123" },
     { id: 2, username: "Chitra.Singla", password: "Chitra@123" },
@@ -74,7 +73,6 @@ const isAdmin = (req, res, next) => {
 
 // --- PUBLIC ROUTES ---
 
-// Homepage Route
 app.get('/', async (req, res) => {
     try {
         const specialReport = await SpecialReport.findOne();
@@ -83,17 +81,16 @@ app.get('/', async (req, res) => {
         const upcomingEvents = await Event.find().sort({ _id: -1 }).limit(3);
         const featuredCourses = await Course.find().sort({ _id: -1 }).limit(3);
 
+        if (!specialReport) {
+            return res.status(503).send("Service Initializing: Special Report not found. Please add one via admin panel.");
+        }
         res.render('index', {
             pageTitle: "SustainWire - ESG News, Jobs, Events & Courses",
-            report: specialReport,
-            news: newsArticles,
-            jobs: esgJobs,
-            events: upcomingEvents,
-            courses: featuredCourses,
+            report: specialReport, news: newsArticles, jobs: esgJobs, events: upcomingEvents, courses: featuredCourses,
             username: req.session.username || null
         });
     } catch (err) {
-        console.error(err);
+        console.error("Error loading homepage:", err.stack); // Better logging
         res.status(500).send("Server Error loading homepage");
     }
 });
@@ -118,41 +115,49 @@ app.get('/courses', async (req, res) => {
 
 // Detail Pages
 app.get('/news/:id', async (req, res) => {
-    const article = await News.findById(req.params.id);
-    if (!article) return res.redirect('/news');
-    res.render('news-detail', { pageTitle: article.title, article: article, username: req.session.username || null });
+    try {
+        const article = await News.findById(req.params.id);
+        if (!article) return res.redirect('/news');
+        res.render('news-detail', { pageTitle: article.title, article: article, username: req.session.username || null });
+    } catch (err) { res.redirect('/news'); }
 });
 app.get('/job/:id', async (req, res) => {
-    const job = await Job.findById(req.params.id);
-    if (!job) return res.redirect('/jobs');
-    res.render('job-detail', { pageTitle: job.title, job: job, username: req.session.username || null });
+    try {
+        const job = await Job.findById(req.params.id);
+        if (!job) return res.redirect('/jobs');
+        res.render('job-detail', { pageTitle: job.title, job: job, username: req.session.username || null });
+    } catch (err) { res.redirect('/jobs'); }
 });
 app.get('/event/:id', async (req, res) => {
-    const event = await Event.findById(req.params.id);
-    if (!event) return res.redirect('/events');
-    res.render('event-detail', { pageTitle: event.title, event: event, username: req.session.username || null });
+    try {
+        const event = await Event.findById(req.params.id);
+        if (!event) return res.redirect('/events');
+        res.render('event-detail', { pageTitle: event.title, event: event, username: req.session.username || null });
+    } catch (err) { res.redirect('/events'); }
 });
 app.get('/course/:id', async (req, res) => {
-    const course = await Course.findById(req.params.id);
-    if (!course) return res.redirect('/courses');
-    res.render('course-detail', { pageTitle: course.title, course: course, username: req.session.username || null });
+    try {
+        const course = await Course.findById(req.params.id);
+        if (!course) return res.redirect('/courses');
+        res.render('course-detail', { pageTitle: course.title, course: course, username: req.session.username || null });
+    } catch (err) { res.redirect('/courses'); }
 });
 app.get('/special-report', async (req, res) => {
-    const report = await SpecialReport.findOne();
-    if (!report) return res.redirect('/');
-    res.render('report-detail', { pageTitle: report.title, report: report, username: req.session.username || null });
+    try {
+        const report = await SpecialReport.findOne();
+        if (!report) return res.redirect('/');
+        res.render('report-detail', { pageTitle: report.title, report: report, username: req.session.username || null });
+    } catch (err) { res.redirect('/'); }
 });
 
 
 // --- AUTHENTICATION ROUTES ---
-
 app.get('/login', (req, res) => {
   if (req.session.isLoggedIn) {
     return res.redirect('/admin/dashboard');
   }
   res.render('login', { pageTitle: "Admin Login", error: null, username: req.session.username || null });
 });
-
 app.post('/login', (req, res) => {
     const { username, password } = req.body;
     const user = users.find(u => u.username === username && u.password === password);
@@ -164,7 +169,6 @@ app.post('/login', (req, res) => {
         res.render('login', { pageTitle: "Admin Login", error: "Invalid username or password", username: req.session.username || null });
     }
 });
-
 app.get('/logout', (req, res) => {
     req.session.destroy(err => {
         res.redirect('/');
@@ -173,16 +177,20 @@ app.get('/logout', (req, res) => {
 
 
 // --- ADMIN ROUTES (Protected) ---
-
 app.get('/admin/dashboard', isAdmin, async (req, res) => {
-    const news = await News.find().sort({ _id: -1 });
-    const jobs = await Job.find().sort({ _id: -1 });
-    const events = await Event.find().sort({ _id: -1 });
-    const courses = await Course.find().sort({ _id: -1 });
-    res.render('admin/dashboard', {
-        pageTitle: "Admin Dashboard",
-        news: news, jobs: jobs, events: events, courses: courses
-    });
+    try {
+        const news = await News.find().sort({ _id: -1 });
+        const jobs = await Job.find().sort({ _id: -1 });
+        const events = await Event.find().sort({ _id: -1 });
+        const courses = await Course.find().sort({ _id: -1 });
+        res.render('admin/dashboard', {
+            pageTitle: "Admin Dashboard",
+            news: news, jobs: jobs, events: events, courses: courses
+        });
+    } catch (err) {
+        console.error("Error loading dashboard data:", err.stack); // Better logging
+        res.status(500).send("Error loading dashboard data.");
+    }
 });
 
 // --- SPECIAL REPORT CRUD (Admin) ---
@@ -210,12 +218,12 @@ app.post('/admin/special-report/edit', isAdmin, upload.single('imageUrl'), async
         report.applyLink = applyLink;
         report.updatedBy = req.session.username;
         if (req.file) {
-            report.imageUrl = req.file.path; // Cloudinary URL
+            report.imageUrl = req.file.path; 
         }
         await report.save();
         res.redirect('/admin/dashboard');
     } catch (err) {
-        console.error(err);
+        console.error("Error updating Special Report:", err.stack); // Better logging
         res.redirect('/admin/dashboard');
     }
 });
@@ -228,17 +236,19 @@ app.get('/admin/news/add', isAdmin, (req, res) => {
 app.post('/admin/news/add', isAdmin, upload.single('imageUrl'), async (req, res) => {
     try {
         const { title, content, category } = req.body;
+        const imageUrl = req.file ? req.file.path : "https://placehold.co/600x400/e2e8f0/334155?text=No+Image+Uploaded";
+        
         const newArticle = new News({
             title: title,
             content: content,
             category: category,
-            imageUrl: req.file.path, // Cloudinary URL
+            imageUrl: imageUrl, 
             updatedBy: req.session.username,
         });
         await newArticle.save();
         res.redirect('/admin/dashboard');
     } catch (err) {
-        console.error(err);
+        console.error("Error adding news:", err.stack); // Better logging
         res.redirect('/admin/dashboard');
     }
 });
@@ -258,12 +268,12 @@ app.post('/admin/news/edit/:id', isAdmin, upload.single('imageUrl'), async (req,
         article.category = category;
         article.updatedBy = req.session.username;
         if (req.file) {
-            article.imageUrl = req.file.path; // Cloudinary URL
+            article.imageUrl = req.file.path; 
         }
         await article.save();
         res.redirect('/admin/dashboard');
     } catch (err) {
-        console.error(err);
+        console.error("Error editing news:", err.stack); // Better logging
         res.redirect('/admin/dashboard');
     }
 });
@@ -291,7 +301,7 @@ app.post('/admin/jobs/add', isAdmin, async (req, res) => {
         await newJob.save();
         res.redirect('/admin/dashboard');
     } catch (err) {
-        console.error(err);
+        console.error("Error adding job:", err.stack); // Better logging
         res.redirect('/admin/dashboard');
     }
 });
@@ -321,7 +331,7 @@ app.post('/admin/jobs/edit/:id', isAdmin, async (req, res) => {
         await job.save();
         res.redirect('/admin/dashboard');
     } catch (err) {
-        console.error(err);
+        console.error("Error editing job:", err.stack); // Better logging
         res.redirect('/admin/dashboard');
     }
 });
@@ -346,7 +356,7 @@ app.post('/admin/events/add', isAdmin, async (req, res) => {
         await newEvent.save();
         res.redirect('/admin/dashboard');
     } catch (err) {
-        console.error(err);
+        console.error("Error adding event:", err.stack); // Better logging
         res.redirect('/admin/dashboard');
     }
 });
@@ -370,7 +380,7 @@ app.post('/admin/events/edit/:id', isAdmin, async (req, res) => {
         await event.save();
         res.redirect('/admin/dashboard');
     } catch (err) {
-        console.error(err);
+        console.error("Error editing event:", err.stack); // Better logging
         res.redirect('/admin/dashboard');
     }
 });
@@ -395,7 +405,7 @@ app.post('/admin/courses/add', isAdmin, async (req, res) => {
         await newCourse.save();
         res.redirect('/admin/dashboard');
     } catch (err) {
-        console.error(err);
+        console.error("Error adding course:", err.stack); // Better logging
         res.redirect('/admin/dashboard');
     }
 });
@@ -419,7 +429,7 @@ app.post('/admin/courses/edit/:id', isAdmin, async (req, res) => {
         await course.save();
         res.redirect('/admin/dashboard');
     } catch (err) {
-        console.error(err);
+        console.error("Error editing course:", err.stack); // Better logging
         res.redirect('/admin/dashboard');
     }
 });
