@@ -90,7 +90,7 @@ app.get('/', async (req, res) => {
             jobs: esgJobs,
             events: upcomingEvents,
             courses: featuredCourses,
-            username: req.session.username || null // Public pages par bhi username bhejo (taaki header mein login/logout dikha sakein)
+            username: req.session.username || null
         });
     } catch (err) {
         console.error(err);
@@ -308,10 +308,7 @@ app.post('/admin/jobs/edit/:id', isAdmin, async (req, res) => {
         const job = await Job.findById(req.params.id);
         let typeColor = 'green';
         if (type === 'Contract') typeColor = 'blue';
-        
-        // YEH WOH LINE HAI JO GALAT THI
         if (type === 'Internship') typeColor = 'yellow'; 
-        // WOH 'SustainWire Server...' WALA TEXT HATA DIYA HAI
 
         job.title = title;
         job.company = company;
@@ -465,4 +462,3 @@ app.get('/admin/analytics/:type/:id', isAdmin, async (req, res) => {
 app.listen(PORT, () => {
     console.log(`Server http://localhost:${PORT} par chal raha hai`);
 });
-```
