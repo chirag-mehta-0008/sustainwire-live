@@ -5,9 +5,9 @@ const path = require('path');
 const session = require('express-session');
 const mongoose = require('mongoose');
 const multer = require('multer'); 
-const cloudinary = require('cloudinary').v2;
-const { CloudinaryStorage } = require('multer-storage-cloudinary');
-const util = require('util'); // YEH NAYA ADD HUA HAI (Super Logger)
+const cloudinary = require('cloudinary').v2; // Naya import
+const { CloudinaryStorage } = require('multer-storage-cloudinary'); // Naya import
+const util = require('util'); 
 
 // --- Database Connection ---
 const connectDB = require('./config/database');
@@ -24,22 +24,24 @@ const SpecialReport = require('./models/SpecialReport');
 const app = express();
 const PORT = process.env.PORT || 3000; 
 
-// --- Cloudinary Configuration ---
+// --- Cloudinary Configuration (YEH NAYA ADD HUA HAI) ---
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
+// Cloudinary Storage Engine (YEH NAYA ADD HUA HAI)
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
-    folder: 'sustainwire-uploads', 
-    format: async (req, file) => 'jpg',
-    public_id: (req, file) => Date.now() + '-' + file.originalname,
+    folder: 'sustainwire-uploads', // Cloudinary mein folder ka naam
+    format: async (req, file) => 'jpg', // Format
+    public_id: (req, file) => Date.now() + '-' + file.originalname, // Unique file name
   },
 });
 
+// Multer ko naye storage se update kiya
 const upload = multer({ storage: storage });
 
 
@@ -73,7 +75,6 @@ const isAdmin = (req, res, next) => {
 };
 
 // --- PUBLIC ROUTES ---
-
 app.get('/', async (req, res) => {
     try {
         const specialReport = await SpecialReport.findOne();
@@ -83,25 +84,20 @@ app.get('/', async (req, res) => {
         const featuredCourses = await Course.find().sort({ _id: -1 }).limit(3);
 
         if (!specialReport) {
-             // Agar database bilkul khali hai, toh crash hone se roko
             return res.status(503).send("Service Initializing: Special Report not found. Please add one via admin panel.");
         }
-
         res.render('index', {
             pageTitle: "SustainWire - ESG News, Jobs, Events & Courses",
-            report: specialReport,
-            news: newsArticles,
-            jobs: esgJobs,
-            events: upcomingEvents,
-            courses: featuredCourses,
+            report: specialReport, news: newsArticles, jobs: esgJobs, events: upcomingEvents, courses: featuredCourses,
             username: req.session.username || null
         });
     } catch (err) {
-        console.error("Error loading homepage:", util.inspect(err)); // YEH UPDATE HUA HAI
+        console.error("Error loading homepage:", util.inspect(err)); 
         res.status(500).send("Server Error loading homepage");
     }
 });
 
+// ... (Baaki saare PUBLIC routes jaise /news, /jobs, /news/:id waise hi rahenge) ...
 // List Pages
 app.get('/news', async (req, res) => {
     const allNews = await News.find().sort({ _id: -1 });
@@ -195,7 +191,7 @@ app.get('/admin/dashboard', isAdmin, async (req, res) => {
             news: news, jobs: jobs, events: events, courses: courses
         });
     } catch (err) {
-        console.error("Error loading dashboard data:", util.inspect(err)); // YEH UPDATE HUA HAI
+        console.error("Error loading dashboard data:", util.inspect(err)); 
         res.status(500).send("Error loading dashboard data.");
     }
 });
@@ -224,13 +220,16 @@ app.post('/admin/special-report/edit', isAdmin, upload.single('imageUrl'), async
         report.content = content;
         report.applyLink = applyLink;
         report.updatedBy = req.session.username;
+        
+        // YEH UPDATE HUA HAI (Ab 'req.file.path' Cloudinary ka URL hai)
         if (req.file) {
             report.imageUrl = req.file.path; 
         }
+        
         await report.save();
         res.redirect('/admin/dashboard');
     } catch (err) {
-        console.error("Error updating Special Report:", util.inspect(err)); // YEH UPDATE HUA HAI
+        console.error("Error updating Special Report:", util.inspect(err)); 
         res.redirect('/admin/dashboard');
     }
 });
@@ -243,6 +242,8 @@ app.get('/admin/news/add', isAdmin, (req, res) => {
 app.post('/admin/news/add', isAdmin, upload.single('imageUrl'), async (req, res) => {
     try {
         const { title, content, category } = req.body;
+        
+        // YEH UPDATE HUA HAI (Ab 'req.file.path' Cloudinary ka URL hai)
         const imageUrl = req.file ? req.file.path : "https://placehold.co/600x400/e2e8f0/334155?text=No+Image+Uploaded";
         
         const newArticle = new News({
@@ -255,7 +256,7 @@ app.post('/admin/news/add', isAdmin, upload.single('imageUrl'), async (req, res)
         await newArticle.save();
         res.redirect('/admin/dashboard');
     } catch (err) {
-        console.error("Error adding news:", util.inspect(err)); // YEH UPDATE HUA HAI
+        console.error("Error adding news:", util.inspect(err)); 
         res.redirect('/admin/dashboard');
     }
 });
@@ -274,13 +275,16 @@ app.post('/admin/news/edit/:id', isAdmin, upload.single('imageUrl'), async (req,
         article.content = content;
         article.category = category;
         article.updatedBy = req.session.username;
+        
+        // YEH UPDATE HUA HAI (Ab 'req.file.path' Cloudinary ka URL hai)
         if (req.file) {
             article.imageUrl = req.file.path; 
         }
+        
         await article.save();
         res.redirect('/admin/dashboard');
     } catch (err) {
-        console.error("Error editing news:", util.inspect(err)); // YEH UPDATE HUA HAI
+        console.error("Error editing news:", util.inspect(err)); 
         res.redirect('/admin/dashboard');
     }
 });
@@ -290,6 +294,7 @@ app.get('/admin/news/delete/:id', isAdmin, async (req, res) => {
     res.redirect('/admin/dashboard');
 });
 
+// ... (Baaki saare ADMIN routes jaise /admin/jobs, /admin/events waise hi rahenge) ...
 // --- JOBS CRUD (Admin) ---
 app.get('/admin/jobs/add', isAdmin, (req, res) => {
     res.render('admin/add-job', { pageTitle: "Add New Job" });
@@ -308,7 +313,7 @@ app.post('/admin/jobs/add', isAdmin, async (req, res) => {
         await newJob.save();
         res.redirect('/admin/dashboard');
     } catch (err) {
-        console.error("Error adding job:", util.inspect(err)); // YEH UPDATE HUA HAI
+        console.error("Error adding job:", util.inspect(err)); 
         res.redirect('/admin/dashboard');
     }
 });
@@ -338,7 +343,7 @@ app.post('/admin/jobs/edit/:id', isAdmin, async (req, res) => {
         await job.save();
         res.redirect('/admin/dashboard');
     } catch (err) {
-        console.error("Error editing job:", util.inspect(err)); // YEH UPDATE HUA HAI
+        console.error("Error editing job:", util.inspect(err)); 
         res.redirect('/admin/dashboard');
     }
 });
@@ -363,7 +368,7 @@ app.post('/admin/events/add', isAdmin, async (req, res) => {
         await newEvent.save();
         res.redirect('/admin/dashboard');
     } catch (err) {
-        console.error("Error adding event:", util.inspect(err)); // YEH UPDATE HUA HAI
+        console.error("Error adding event:", util.inspect(err)); 
         res.redirect('/admin/dashboard');
     }
 });
@@ -387,7 +392,7 @@ app.post('/admin/events/edit/:id', isAdmin, async (req, res) => {
         await event.save();
         res.redirect('/admin/dashboard');
     } catch (err) {
-        console.error("Error editing event:", util.inspect(err)); // YEH UPDATE HUA HAI
+        console.error("Error editing event:", util.inspect(err)); 
         res.redirect('/admin/dashboard');
     }
 });
@@ -412,7 +417,7 @@ app.post('/admin/courses/add', isAdmin, async (req, res) => {
         await newCourse.save();
         res.redirect('/admin/dashboard');
     } catch (err) {
-        console.error("Error adding course:", util.inspect(err)); // YEH UPDATE HUA HAI
+        console.error("Error adding course:", util.inspect(err)); 
         res.redirect('/admin/dashboard');
     }
 });
@@ -436,7 +441,7 @@ app.post('/admin/courses/edit/:id', isAdmin, async (req, res) => {
         await course.save();
         res.redirect('/admin/dashboard');
     } catch (err) {
-        console.error("Error editing course:", util.inspect(err)); // YEH UPDATE HUA HAI
+        console.error("Error editing course:", util.inspect(err)); 
         res.redirect('/admin/dashboard');
     }
 });
@@ -469,9 +474,23 @@ app.get('/admin/analytics/:type/:id', isAdmin, async (req, res) => {
             type: type
         });
     } catch (err) {
-        console.error("Error loading analytics:", util.inspect(err)); // YEH UPDATE HUA HAI
+        console.error("Error loading analytics:", util.inspect(err)); 
         res.redirect('/admin/dashboard');
     }
+});
+
+
+// --- Global Error Handler ---
+app.use((err, req, res, next) => {
+    console.error("--- GLOBAL ERROR HANDLER CATCH ---");
+    console.error(util.inspect(err, {depth: null})); 
+    
+    if (err instanceof multer.MulterError) {
+        return res.status(500).send("Multer error: " + err.message);
+    } else if (err) {
+        return res.status(500).send("An unexpected error occurred: " + err.message);
+    }
+    next();
 });
 
 
