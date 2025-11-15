@@ -7,6 +7,7 @@ const mongoose = require('mongoose');
 const multer = require('multer'); 
 const cloudinary = require('cloudinary').v2;
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const util = require('util'); // YEH NAYA ADD HUA HAI (Super Logger)
 
 // --- Database Connection ---
 const connectDB = require('./config/database');
@@ -82,15 +83,21 @@ app.get('/', async (req, res) => {
         const featuredCourses = await Course.find().sort({ _id: -1 }).limit(3);
 
         if (!specialReport) {
+             // Agar database bilkul khali hai, toh crash hone se roko
             return res.status(503).send("Service Initializing: Special Report not found. Please add one via admin panel.");
         }
+
         res.render('index', {
             pageTitle: "SustainWire - ESG News, Jobs, Events & Courses",
-            report: specialReport, news: newsArticles, jobs: esgJobs, events: upcomingEvents, courses: featuredCourses,
+            report: specialReport,
+            news: newsArticles,
+            jobs: esgJobs,
+            events: upcomingEvents,
+            courses: featuredCourses,
             username: req.session.username || null
         });
     } catch (err) {
-        console.error("Error loading homepage:", err.stack); // Better logging
+        console.error("Error loading homepage:", util.inspect(err)); // YEH UPDATE HUA HAI
         res.status(500).send("Server Error loading homepage");
     }
 });
@@ -188,7 +195,7 @@ app.get('/admin/dashboard', isAdmin, async (req, res) => {
             news: news, jobs: jobs, events: events, courses: courses
         });
     } catch (err) {
-        console.error("Error loading dashboard data:", err.stack); // Better logging
+        console.error("Error loading dashboard data:", util.inspect(err)); // YEH UPDATE HUA HAI
         res.status(500).send("Error loading dashboard data.");
     }
 });
@@ -223,7 +230,7 @@ app.post('/admin/special-report/edit', isAdmin, upload.single('imageUrl'), async
         await report.save();
         res.redirect('/admin/dashboard');
     } catch (err) {
-        console.error("Error updating Special Report:", err.stack); // Better logging
+        console.error("Error updating Special Report:", util.inspect(err)); // YEH UPDATE HUA HAI
         res.redirect('/admin/dashboard');
     }
 });
@@ -248,7 +255,7 @@ app.post('/admin/news/add', isAdmin, upload.single('imageUrl'), async (req, res)
         await newArticle.save();
         res.redirect('/admin/dashboard');
     } catch (err) {
-        console.error("Error adding news:", err.stack); // Better logging
+        console.error("Error adding news:", util.inspect(err)); // YEH UPDATE HUA HAI
         res.redirect('/admin/dashboard');
     }
 });
@@ -273,7 +280,7 @@ app.post('/admin/news/edit/:id', isAdmin, upload.single('imageUrl'), async (req,
         await article.save();
         res.redirect('/admin/dashboard');
     } catch (err) {
-        console.error("Error editing news:", err.stack); // Better logging
+        console.error("Error editing news:", util.inspect(err)); // YEH UPDATE HUA HAI
         res.redirect('/admin/dashboard');
     }
 });
@@ -301,7 +308,7 @@ app.post('/admin/jobs/add', isAdmin, async (req, res) => {
         await newJob.save();
         res.redirect('/admin/dashboard');
     } catch (err) {
-        console.error("Error adding job:", err.stack); // Better logging
+        console.error("Error adding job:", util.inspect(err)); // YEH UPDATE HUA HAI
         res.redirect('/admin/dashboard');
     }
 });
@@ -331,7 +338,7 @@ app.post('/admin/jobs/edit/:id', isAdmin, async (req, res) => {
         await job.save();
         res.redirect('/admin/dashboard');
     } catch (err) {
-        console.error("Error editing job:", err.stack); // Better logging
+        console.error("Error editing job:", util.inspect(err)); // YEH UPDATE HUA HAI
         res.redirect('/admin/dashboard');
     }
 });
@@ -356,7 +363,7 @@ app.post('/admin/events/add', isAdmin, async (req, res) => {
         await newEvent.save();
         res.redirect('/admin/dashboard');
     } catch (err) {
-        console.error("Error adding event:", err.stack); // Better logging
+        console.error("Error adding event:", util.inspect(err)); // YEH UPDATE HUA HAI
         res.redirect('/admin/dashboard');
     }
 });
@@ -380,7 +387,7 @@ app.post('/admin/events/edit/:id', isAdmin, async (req, res) => {
         await event.save();
         res.redirect('/admin/dashboard');
     } catch (err) {
-        console.error("Error editing event:", err.stack); // Better logging
+        console.error("Error editing event:", util.inspect(err)); // YEH UPDATE HUA HAI
         res.redirect('/admin/dashboard');
     }
 });
@@ -405,7 +412,7 @@ app.post('/admin/courses/add', isAdmin, async (req, res) => {
         await newCourse.save();
         res.redirect('/admin/dashboard');
     } catch (err) {
-        console.error("Error adding course:", err.stack); // Better logging
+        console.error("Error adding course:", util.inspect(err)); // YEH UPDATE HUA HAI
         res.redirect('/admin/dashboard');
     }
 });
@@ -429,7 +436,7 @@ app.post('/admin/courses/edit/:id', isAdmin, async (req, res) => {
         await course.save();
         res.redirect('/admin/dashboard');
     } catch (err) {
-        console.error("Error editing course:", err.stack); // Better logging
+        console.error("Error editing course:", util.inspect(err)); // YEH UPDATE HUA HAI
         res.redirect('/admin/dashboard');
     }
 });
@@ -462,7 +469,7 @@ app.get('/admin/analytics/:type/:id', isAdmin, async (req, res) => {
             type: type
         });
     } catch (err) {
-        console.error(err);
+        console.error("Error loading analytics:", util.inspect(err)); // YEH UPDATE HUA HAI
         res.redirect('/admin/dashboard');
     }
 });
