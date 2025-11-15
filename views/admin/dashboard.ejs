@@ -1,0 +1,195 @@
+<%- include('../partials/admin-header') %>
+
+<!-- Admin Dashboard Content -->
+<div class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <!-- Welcome Message (YEH UPDATE HUA HAI) -->
+    <h1 class="text-3xl font-bold text-esg-dark mb-8">Admin Dashboard</h1>
+    <p class="text-xl text-gray-700 -mt-4 mb-8">Welcome back, <strong><%= username %></strong>!</p>
+
+
+    <!-- 0. Manage Special Report -->
+    <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+        <div class="flex justify-between items-center">
+            <div>
+                <h2 class="text-2xl font-bold text-esg-dark">Manage Special Report</h2>
+                <p class="text-gray-600">This section lets you edit, update, and delete Special Reports.</p>
+            </div>
+            <a href="/admin/special-report/edit" class="inline-block bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">
+                Edit Special Report
+            </a>
+        </div>
+    </div>
+
+    <!-- 1. Manage News Section (YEH UPDATE HUA HAI) -->
+    <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-2xl font-bold text-esg-dark">Manage News</h2>
+            <a href="/admin/news/add" class="inline-block bg-brand-green text-white font-bold py-2 px-4 rounded-lg hover:bg-green-700 transition-colors">
+                + Add New Article
+            </a>
+        </div>
+        
+        <div class="overflow-x-auto">
+            <table class="min-w-full bg-white border">
+                <thead class="bg-gray-200">
+                    <tr>
+                        <th class="py-2 px-4 border-b text-left">Image</th>
+                        <th class="py-2 px-4 border-b text-left">Title</th>
+                        <th class="py-2 px-4 border-b text-left">Category</th>
+                        <th class="py-2 px-4 border-b text-left">Last Updated By</th> <!-- Naya Column -->
+                        <th class="py-2 px-4 border-b text-left">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% if (news && news.length > 0) { %>
+                        <% news.forEach(article => { %>
+                            <tr class="hover:bg-gray-50">
+                                <td class="py-2 px-4 border-b"><img src="<%= article.imageUrl %>" alt="img" class="h-12 w-16 object-cover rounded"></td>
+                                <td class="py-2 px-4 border-b"><%= article.title %></td>
+                                <td class="py-2 px-4 border-b"><%= article.category %></td>
+                                <td class="py-2 px-4 border-b"><%= article.updatedBy || 'N/A' %></td> <!-- Naya Data -->
+                                <td class="py-2 px-4 border-b">
+                                    <a href="/admin/news/edit/<%= article.id %>" class="text-blue-600 hover:text-blue-800 font-medium mr-3">Edit</a>
+                                    <a href="/admin/news/delete/<%= article.id %>" class="text-red-600 hover:text-red-800 font-medium">Delete</a>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    <% } else { %>
+                        <tr><td colspan="5" class="py-4 px-4 text-center text-gray-500">No news articles found.</td></tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- 2. Manage Jobs Section (YEH UPDATE HUA HAI) -->
+    <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-2xl font-bold text-esg-dark">Manage Jobs</h2>
+            <a href="/admin/jobs/add" class="inline-block bg-brand-green text-white font-bold py-2 px-4 rounded-lg hover:bg-green-700 transition-colors">
+                + Add New Job
+            </a>
+        </div>
+        
+        <div class="overflow-x-auto">
+            <table class="min-w-full bg-white border">
+                <thead class="bg-gray-200">
+                    <tr>
+                        <th class="py-2 px-4 border-b text-left">Title</th>
+                        <th class="py-2 px-4 border-b text-left">Company</th>
+                        <th class="py-2 px-4 border-b text-left">Type</th>
+                        <th class="py-2 px-4 border-b text-left">Last Updated By</th> <!-- Naya Column -->
+                        <th class="py-2 px-4 border-b text-left">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% if (jobs && jobs.length > 0) { %>
+                        <% jobs.forEach(job => { %>
+                            <tr class="hover:bg-gray-50">
+                                <td class="py-2 px-4 border-b"><%= job.title %></td>
+                                <td class="py-2 px-4 border-b"><%= job.company %></td>
+                                <td class="py-2 px-4 border-b">
+                                    <% let bgColor = 'bg-green-100'; let textColor = 'text-green-700'; %>
+                                    <% if (job.typeColor === 'blue') { bgColor = 'bg-blue-100'; textColor = 'text-job-blue'; } else if (job.typeColor === 'yellow') { bgColor = 'bg-yellow-100'; textColor = 'text-job-yellow'; } %>
+                                    <span class="mt-2 sm:mt-0 <%= bgColor %> <%= textColor %> text-sm font-medium px-3 py-1 rounded-full"><%= job.type %></span>
+                                </td>
+                                <td class="py-2 px-4 border-b"><%= job.updatedBy || 'N/A' %></td> <!-- Naya Data -->
+                                <td class="py-2 px-4 border-b">
+                                    <a href="/admin/jobs/edit/<%= job.id %>" class="text-blue-600 hover:text-blue-800 font-medium mr-3">Edit</a>
+                                    <a href="/admin/jobs/delete/<%= job.id %>" class="text-red-600 hover:text-red-800 font-medium">Delete</a>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    <% } else { %>
+                        <tr><td colspan="5" class="py-4 px-4 text-center text-gray-500">No jobs found.</td></tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- 3. Manage Events Section (YEH UPDATE HUA HAI) -->
+    <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-2xl font-bold text-esg-dark">Manage Events</h2>
+            <a href="/admin/events/add" class="inline-block bg-brand-green text-white font-bold py-2 px-4 rounded-lg hover:bg-green-700 transition-colors">
+                + Add New Event
+            </a>
+        </div>
+        
+        <div class="overflow-x-auto">
+            <table class="min-w-full bg-white border">
+                <thead class="bg-gray-200">
+                    <tr>
+                        <th class="py-2 px-4 border-b text-left">Title</th>
+                        <th class="py-2 px-4 border-b text-left">Date</th>
+                        <th class="py-2 px-4 border-b text-left">Location</th>
+                        <th class="py-2 px-4 border-b text-left">Last Updated By</th> <!-- Naya Column -->
+                        <th class="py-2 px-4 border-b text-left">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% if (events && events.length > 0) { %>
+                        <% events.forEach(event => { %>
+                            <tr class="hover:bg-gray-50">
+                                <td class="py-2 px-4 border-b"><%= event.title %></td>
+                                <td class="py-2 px-4 border-b"><%= event.date %></td>
+                                <td class="py-2 px-4 border-b"><%= event.location %></td>
+                                <td class="py-2 px-4 border-b"><%= event.updatedBy || 'N/A' %></td> <!-- Naya Data -->
+                                <td class="py-2 px-4 border-b">
+                                    <a href="/admin/events/edit/<%= event.id %>" class="text-blue-600 hover:text-blue-800 font-medium mr-3">Edit</a>
+                                    <a href="/admin/events/delete/<%= event.id %>" class="text-red-600 hover:text-red-800 font-medium">Delete</a>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    <% } else { %>
+                        <tr><td colspan="5" class="py-4 px-4 text-center text-gray-500">No events found.</td></tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- 4. Manage Courses Section (YEH UPDATE HUA HAI) -->
+    <div class="bg-white p-6 rounded-lg shadow-lg">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-2xl font-bold text-esg-dark">Manage Courses</h2>
+            <a href="/admin/courses/add" class="inline-block bg-brand-green text-white font-bold py-2 px-4 rounded-lg hover:bg-green-700 transition-colors">
+                + Add New Course
+            </a>
+        </div>
+        
+        <div class="overflow-x-auto">
+            <table class="min-w-full bg-white border">
+                <thead class="bg-gray-200">
+                    <tr>
+                        <th class="py-2 px-4 border-b text-left">Title</th>
+                        <th class="py-2 px-4 border-b text-left">Provider</th>
+                        <th class="py-2 px-4 border-b text-left">Last Updated By</th> <!-- Naya Column -->
+                        <th class="py-2 px-4 border-b text-left">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% if (courses && courses.length > 0) { %>
+                        <% courses.forEach(course => { %>
+                            <tr class="hover:bg-gray-50">
+                                <td class="py-2 px-4 border-b"><%= course.title %></td>
+                                <td class="py-2 px-4 border-b"><%= course.provider %></td>
+                                <td class="py-2 px-4 border-b"><%= course.updatedBy || 'N/A' %></td> <!-- Naya Data -->
+                                <td class="py-2 px-4 border-b">
+                                    <a href="/admin/courses/edit/<%= course.id %>" class="text-blue-600 hover:text-blue-800 font-medium mr-3">Edit</a>
+                                    <a href="/admin/courses/delete/<%= course.id %>" class="text-red-600 hover:text-red-800 font-medium">Delete</a>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    <% } else { %>
+                        <tr><td colspan="4" class="py-4 px-4 text-center text-gray-500">No courses found.</td></tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<%- include('../partials/admin-footer') %>

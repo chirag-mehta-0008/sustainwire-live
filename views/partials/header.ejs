@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<!-- 'lang' attribute ke saath 'class' add karenge, jo JS se control hoga -->
+<html lang="en" class=""> 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= pageTitle %></title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            // YEH NAYA ADD HUA HAI: Dark mode ko 'class' strategy par set kar rahe hain
+            darkMode: 'class', 
+            theme: {
+                extend: {
+                    fontFamily: { 'sans': ['Inter', 'sans-serif'], },
+                    colors: {
+                        'brand-green': '#10b981', 
+                        'brand-teal': '#0d9488',  
+                        'brand-dark': '#111827', 
+                        'esg-dark': '#1a1a1a', 
+                        'job-blue': '#1d4ed8',
+                        'job-yellow': '#ca8a04',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+        html { scroll-behavior: smooth; }
+        .gradient-text {
+            background: linear-gradient(to right, #10b981, #0d9488);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .btn-gradient { ... }
+        .btn-gradient:hover { ... }
+        @keyframes fadeInDown { ... }
+        @keyframes fadeInUp { ... }
+        .animate-fadeInDown { ... }
+        .animate-fadeInUp { ... }
+        .delay-200 { ... }
+        .delay-400 { ... }
+        /* YEH NAYA ADD HUA HAI (Dark mode prose) */
+        .prose { color: #333; }
+        .dark .prose { color: #ccc; } /* Prose text in dark mode */
+        .prose h1 { font-size: 2.25rem; font-weight: 800; }
+        .dark .prose h1 { color: #fff; } /* Prose H1 in dark mode */
+        .prose p { font-size: 1.125rem; line-height: 1.75; margin-top: 1.5em; margin-bottom: 1.5em; }
+        .dark .prose p { color: #ccc; } /* Prose p in dark mode */
+    </style>
+
+    <!-- YEH SCRIPT NAYI ADD HUI HAI (Page load hone se pehle theme set karne ke liye) -->
+    <script>
+        // Flash of unstyled content (FOUC) ko rokne ke liye
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
+</head>
+<!-- YEH UPDATE HUA HAI (dark: classes add hui hain) -->
+<body class="bg-white text-brand-dark dark:bg-gray-900 dark:text-gray-200 transition-colors duration-300">
+
+    <!-- Header / Navbar (YEH UPDATE HUA HAI) -->
+    <nav class="bg-white sticky top-0 z-50 border-b border-gray-200 shadow-sm animate-fadeInDown dark:bg-gray-900 dark:border-gray-700">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <div class="flex-shrink-0 flex items-center">
+                    <a href="/" class="text-3xl font-extrabold gradient-text">SustainWire</a>
+                </div>
+                <div class="hidden sm:block sm:ml-6">
+                    <div class="flex space-x-6 items-center">
+                        <a href="/news" class="text-gray-700 hover:text-brand-green font-medium transition-colors dark:text-gray-300 dark:hover:text-brand-green">News</a>
+                        <a href="/jobs" class="text-gray-700 hover:text-brand-green font-medium transition-colors dark:text-gray-300 dark:hover:text-brand-green">Jobs</a>
+                        <a href="/events" class="text-gray-700 hover:text-brand-green font-medium transition-colors dark:text-gray-300 dark:hover:text-brand-green">Events</a>
+                        <a href="/courses" class="text-gray-700 hover:text-brand-green font-medium transition-colors dark:text-gray-300 dark:hover:text-brand-green">Courses</a>
+                        <a href="/login" class="text-blue-600 hover:text-brand-green font-medium transition-colors dark:text-blue-400 dark:hover:text-brand-green">Admin Login</a>
+                        
+                        <!-- YEH NAYA ADD HUA HAI (Dark Mode Toggle Button) -->
+                        <button id="theme-toggle" class="ml-2 p-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                            <!-- Moon icon (Light mode mein dikhega) -->
+                            <svg id="theme-toggle-dark-icon" class="w-5 h-5 dark:hidden" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+                            <!-- Sun icon (Dark mode mein dikhega) -->
+                            <svg id="theme-toggle-light-icon" class="w-5 h-5 hidden dark:block" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.707.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM10 18a1 1 0 01-1-1v-1a1 1 0 112 0v1a1 1 0 01-1 1zM5.05 14.95l-.707.707a1 1 0 001.414 1.414l.707-.707a1 1 0 00-1.414-1.414zM1.707 4.293a1 1 0 010-1.414l.707-.707a1 1 0 111.414 1.414l-.707.707a1 1 0 01-1.414 0zM15 10a1 1 0 01-1 1H4a1 1 0 110-2h10a1 1 0 011 1z" fill-rule="evenodd" clip-rule="evenodd"></path></svg>
+                        </button>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>

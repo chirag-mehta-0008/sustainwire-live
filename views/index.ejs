@@ -1,0 +1,167 @@
+<!-- Header include waisa hi rahega -->
+<%- include('partials/header') %>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+
+        <!-- Featured Article (YEH UPDATE HUA HAI) -->
+        <div class="mb-16 animate-fadeInUp">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                <div class="pr-8">
+                    <span class="text-brand-green text-sm font-bold uppercase tracking-wider">Special Report</span>
+                    <h1 class="text-4xl lg:text-5xl font-extrabold text-brand-dark dark:text-white mt-4 mb-6">
+                        <%= report.title %>
+                    </h1>
+                    <p class="text-gray-600 dark:text-gray-300 text-lg mb-8" style="white-space: pre-wrap;"><%= report.content.substring(0, 150) %>...</p>
+                    <a href="/special-report" class="inline-block w-auto bg-brand-dark text-white font-bold py-3 px-8 rounded-lg transition-all hover:bg-gray-700 hover:shadow-lg dark:bg-gray-200 dark:text-brand-dark dark:hover:bg-white">
+                        Read Full Analysis
+                    </a>
+                </div>
+                <div>
+                    <img class="w-full object-cover rounded-xl shadow-lg" 
+                         src="<%= report.imageUrl %>"
+                         onerror="this.src='https://placehold.co/800x600/e2e8f0/334155?text=Image+Error'"
+                         alt="<%= report.title %>">
+                </div>
+            </div>
+        </div>
+
+        <!-- Latest News Grid (YEH UPDATE HUA HAI) -->
+        <div id="news" class="pt-8 animate-fadeInUp delay-200">
+            <h2 class="text-3xl font-bold text-brand-dark dark:text-white mb-8 border-b border-gray-200 dark:border-gray-700 pb-4">Latest News</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <% if (news && news.length > 0) { %>
+                    <% news.forEach(article => { %>
+                        <div class="bg-white dark:bg-gray-800 rounded-lg overflow-hidden group transition-all duration-300 hover:shadow-xl border border-gray-100 dark:border-gray-700 dark:hover:shadow-lg dark:hover:shadow-brand-teal/10">
+                            <div class="overflow-hidden">
+                                <img class="h-56 w-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                                     src="<%= article.imageUrl %>" 
+                                     onerror="this.src='https://placehold.co/600x400/e2e8f0/334155?text=Image+Error'"
+                                     alt="<%= article.title %>">
+                            </div>
+                            <div class="p-6">
+                                <span class="text-sm text-brand-green font-bold uppercase"><%= article.category %></span>
+                                <h4 class="text-2xl font-bold text-brand-dark dark:text-white mt-2 mb-3 hover:text-brand-green transition-colors cursor-pointer">
+                                    <%= article.title %>
+                                </h4>
+                                <p class="text-gray-600 dark:text-gray-400 mb-4 text-sm leading-relaxed">
+                                    <%= article.content.substring(0, 100) %>...
+                                </p>
+                                <a href="/news/<%= article.id %>" class="font-bold text-brand-dark dark:text-gray-200 hover:text-brand-green transition-colors">Read More &rarr;</a>
+                            </div>
+                        </div>
+                    <% }) %>
+                <% } else { %>
+                    <p>No news articles found.</p>
+                <% } %>
+            </div>
+            <div class="text-center mt-8">
+                <a href="/news" class="inline-block bg-gray-200 text-brand-dark font-bold py-3 px-6 rounded-lg hover:bg-gray-300 transition-colors dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600">
+                    View All News
+                </a>
+            </div>
+        </div>
+
+        <!-- ESG Jobs Section (YEH UPDATE HUA HAI) -->
+        <div id="jobs" class="mt-16 pt-8 animate-fadeInUp delay-400">
+            <h2 class="text-3xl font-bold text-brand-dark dark:text-white mb-8 border-b border-gray-200 dark:border-gray-700 pb-4">Top ESG Jobs</h2>
+            
+            <div class="space-y-4">
+                <% if (jobs && jobs.length > 0) { %>
+                    <% jobs.forEach(job => { %>
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center p-5 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow">
+                            <div>
+                                <a href="/job/<%= job.id %>" class="hover:text-brand-green transition-colors">
+                                    <h4 class="text-xl font-bold text-brand-dark dark:text-white"><%= job.title %></h4>
+                                </a>
+                                <p class="text-gray-600 dark:text-gray-400"><%= job.company %> | <%= job.location %></p>
+                            </div>
+                            
+                            <% let bgColor = 'bg-green-100'; %>
+                            <% let textColor = 'text-green-700'; %>
+                            <% if (job.typeColor === 'blue') { %>
+                                <% bgColor = 'bg-blue-100'; textColor = 'text-job-blue'; %>
+                            <% } else if (job.typeColor === 'yellow') { %>
+                                <% bgColor = 'bg-yellow-100'; textColor = 'text-job-yellow'; %>
+                            <% } %>
+                            <span class="mt-2 sm:mt-0 <%= bgColor %> <%= textColor %> text-sm font-medium px-3 py-1 rounded-full"><%= job.type %></span>
+                        </div>
+                    <% }) %>
+                <% } else { %>
+                    <p>No jobs found.</p>
+                <% } %>
+            </div>
+            <div class="text-center mt-8">
+                <a href="/jobs" class="inline-block bg-gray-200 text-brand-dark font-bold py-3 px-6 rounded-lg hover:bg-gray-300 transition-colors dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600">
+                    View All Jobs
+                </a>
+            </div>
+        </div>
+
+        <!-- Upcoming Events Section (YEH UPDATE HUA HAI) -->
+        <div id="events" class="mt-16 pt-8 animate-fadeInUp delay-400">
+            <h2 class="text-3xl font-bold text-brand-dark dark:text-white mb-8 border-b border-gray-200 dark:border-gray-700 pb-4">Upcoming Events</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <% if (events && events.length > 0) { %>
+                    <% events.forEach(event => { %>
+                        <div class="bg-white dark:bg-gray-800 rounded-lg overflow-hidden group transition-all duration-300 hover:shadow-xl border border-gray-100 dark:border-gray-700 dark:hover:shadow-lg dark:hover:shadow-brand-teal/10">
+                            <div class="p-6">
+                                <span class="text-sm text-brand-green font-bold uppercase"><%= event.date %> | <%= event.location %></span>
+                                <h4 class="text-2xl font-bold text-brand-dark dark:text-white mt-2 mb-3 hover:text-brand-green transition-colors cursor-pointer">
+                                    <%= event.title %>
+                                </h4>
+                                <p class="text-gray-600 dark:text-gray-400 mb-4 text-sm leading-relaxed">
+                                    <%= event.description.substring(0, 100) %>...
+                                </p>
+                                <a href="/event/<%= event.id %>" class="font-bold text-brand-dark dark:text-gray-200 hover:text-brand-green transition-colors">Register Now &rarr;</a>
+                            </div>
+                        </div>
+                    <% }) %>
+                <% } else { %>
+                    <p>No events found.</p>
+                <% } %>
+            </div>
+            <div class="text-center mt-8">
+                <a href="/events" class="inline-block bg-gray-200 text-brand-dark font-bold py-3 px-6 rounded-lg hover:bg-gray-300 transition-colors dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600">
+                    View All Events
+                </a>
+            </div>
+        </div>
+
+        <!-- Featured Courses Section (YEH UPDATE HUA HAI) -->
+        <div id="courses" class="mt-16 pt-8 animate-fadeInUp delay-400">
+            <h2 class="text-3xl font-bold text-brand-dark dark:text-white mb-8 border-b border-gray-200 dark:border-gray-700 pb-4">Featured Courses</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <% if (courses && courses.length > 0) { %>
+                    <% courses.forEach(course => { %>
+                        <div class="bg-white dark:bg-gray-800 rounded-lg overflow-hidden group transition-all duration-300 hover:shadow-xl border border-gray-100 dark:border-gray-700 dark:hover:shadow-lg dark:hover:shadow-brand-teal/10">
+                            <div class="p-6">
+                                <span class="text-sm text-brand-green font-bold uppercase"><%= course.format %></span>
+                                <h4 class="text-2xl font-bold text-brand-dark dark:text-white mt-2 mb-3 hover:text-brand-green transition-colors cursor-pointer">
+                                    <%= course.title %>
+                                </h4>
+                                <p class="text-gray-600 dark:text-gray-400 mb-4 text-sm leading-relaxed">
+                                    <%= course.description.substring(0, 100) %>... (<%= course.provider %>)
+                                </p>
+                                <a href="/course/<%= course.id %>" class="font-bold text-brand-dark dark:text-gray-200 hover:text-brand-green transition-colors">Learn More &rarr;</a>
+                            </div>
+                        </div>
+                    <% }) %>
+                <% } else { %>
+                    <p>No courses found.</p>
+                <% } %>
+            </div>
+            <div class="text-center mt-8">
+                <a href="/courses" class="inline-block bg-gray-200 text-brand-dark font-bold py-3 px-6 rounded-lg hover:bg-gray-300 transition-colors dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600">
+                    View All Courses
+                </a>
+            </div>
+        </div>
+
+    </div>
+
+<!-- Footer include waisa hi rahega -->
+<%- include('partials/footer') %>

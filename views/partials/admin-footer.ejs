@@ -1,0 +1,21 @@
+<!-- YEH NAYA ADD HUA HAI (Theme toggle ka logic) -->
+    <script>
+        const themeToggleBtn = document.getElementById('theme-toggle');
+
+        // Check if the button exists before adding listener
+        if (themeToggleBtn) {
+            themeToggleBtn.addEventListener('click', function() {
+                // 'dark' class ko html tag par toggle karo
+                document.documentElement.classList.toggle('dark');
+
+                // preference ko localStorage mein save karo
+                if (document.documentElement.classList.contains('dark')) {
+                    localStorage.theme = 'dark';
+                } else {
+                    localStorage.theme = 'light';
+                }
+            });
+        }
+    </script>
+</body>
+</html>

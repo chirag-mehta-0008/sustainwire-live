@@ -1,0 +1,47 @@
+<%- include('partials/header') %>
+
+<!-- Main Content -->
+<div class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="max-w-3xl mx-auto">
+        
+        <!-- Job Header -->
+        <div class="mb-8">
+            <span class="text-sm text-brand-green font-bold uppercase"><%= job.company %> | <%= job.location %></span>
+            <h1 class="text-4xl lg:text-5xl font-extrabold text-brand-dark dark:text-white mt-2 mb-4">
+                <%= job.title %>
+            </h1>
+            
+            <% let bgColor = 'bg-green-100'; %>
+            <% let textColor = 'text-green-700'; %>
+            <% if (job.typeColor === 'blue') { %>
+                <% bgColor = 'bg-blue-100'; textColor = 'text-job-blue'; %>
+            <% } else if (job.typeColor === 'yellow') { %>
+                <% bgColor = 'bg-yellow-100'; textColor = 'text-job-yellow'; %>
+            <% } %>
+            <span class="mt-2 sm:mt-0 <%= bgColor %> <%= textColor %> text-lg font-medium px-4 py-2 rounded-full"><%= job.type %></span>
+        </div>
+
+        <!-- YEH BUTTON UPDATE HUA HAI -->
+        <div class="mb-8">
+            <!-- 'href' ab dynamic hai aur naye tab mein khulega -->
+            <a href="<%= job.applyLink %>" target="_blank" rel="noopener noreferrer" class="inline-block w-auto bg-brand-green hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg transition-all btn-gradient">
+                Apply for this Job
+            </a>
+        </div>
+
+        <!-- Job Content (Description) -->
+        <div class="prose prose-lg max-w-none text-gray-700 text-lg leading-relaxed dark:text-gray-300" style="white-space: pre-wrap;">
+            <%= job.description %>
+        </div>
+
+        <!-- Back Button -->
+        <div class="mt-12 border-t border-gray-200 dark:border-gray-700 pt-8">
+            <a href="/" class="font-bold text-brand-dark dark:text-gray-200 hover:text-brand-green transition-colors">
+                &larr; Back to Homepage
+            </a>
+        </div>
+
+    </div>
+</div>
+
+<%- include('partials/footer') %>

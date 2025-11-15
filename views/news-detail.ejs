@@ -1,0 +1,40 @@
+<%- include('partials/header') %>
+
+<!-- Main Content -->
+<div class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="max-w-3xl mx-auto">
+        
+        <!-- Article Header (YEH UPDATE HUA HAI) -->
+        <div class="mb-8">
+            <span class="text-sm text-brand-green font-bold uppercase"><%= article.category %></span>
+            <!-- 'dark:text-white' add kiya hai -->
+            <h1 class="text-4xl lg:text-5xl font-extrabold text-brand-dark dark:text-white mt-2 mb-4">
+                <%= article.title %>
+            </h1>
+        </div>
+
+        <!-- Featured Image -->
+        <div class="mb-8">
+            <img class="w-full h-auto object-cover rounded-xl shadow-lg" 
+                 src="<%= article.imageUrl %>" 
+                 onerror="this.src='https://placehold.co/800x600/e2e8f0/334155?text=Image+Error'" 
+                 alt="<%= article.title %>">
+        </div>
+
+        <!-- Article Content (YEH UPDATE HUA HAI) -->
+        <!-- 'prose' class ab dark mode lega (header.ejs se) aur fallback 'dark:text-gray-300' add kiya hai -->
+        <div class="prose prose-lg max-w-none text-gray-700 text-lg leading-relaxed dark:text-gray-300" style="white-space: pre-wrap;">
+            <%= article.content %>
+        </div>
+
+        <!-- Back Button (YEH UPDATE HUA HAI) -->
+        <div class="mt-12 border-t border-gray-200 dark:border-gray-700 pt-8">
+            <a href="/" class="font-bold text-brand-dark dark:text-gray-200 hover:text-brand-green transition-colors">
+                &larr; Back to Homepage
+            </a>
+        </div>
+
+    </div>
+</div>
+
+<%- include('partials/footer') %>

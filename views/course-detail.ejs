@@ -1,0 +1,39 @@
+<%- include('partials/header') %>
+
+<!-- Main Content -->
+<div class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="max-w-3xl mx-auto">
+        
+        <!-- Course Header -->
+        <div class="mb-8">
+            <span class="text-sm text-brand-green font-bold uppercase"><%= course.format %></span>
+            <h1 class="text-4xl lg:text-5xl font-extrabold text-brand-dark dark:text-white mt-2 mb-4">
+                <%= course.title %>
+            </h1>
+            <p class="text-xl text-gray-600 dark:text-gray-300">Offered by: <strong><%= course.provider %></strong></p>
+        </div>
+
+        <!-- Course Content -->
+        <div class="prose prose-lg max-w-none text-gray-700 text-lg leading-relaxed dark:text-gray-300" style="white-space: pre-wrap;">
+            <%= course.description %>
+        </div>
+        
+        <!-- YEH BUTTON UPDATE HUA HAI -->
+        <div class="mt-8">
+            <!-- 'href' ab dynamic hai aur naye tab mein khulega -->
+            <a href="<%= course.applyLink %>" target="_blank" rel="noopener noreferrer" class="inline-block w-auto bg-brand-green hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg transition-all btn-gradient">
+                Enroll in this Course
+            </a>
+        </div>
+
+        <!-- Back Button -->
+        <div class="mt-12 border-t border-gray-200 dark:border-gray-700 pt-8">
+            <a href="/" class="font-bold text-brand-dark dark:text-gray-200 hover:text-brand-green transition-colors">
+                &larr; Back to Homepage
+            </a>
+        </div>
+
+    </div>
+</div>
+
+<%- include('partials/footer') %>

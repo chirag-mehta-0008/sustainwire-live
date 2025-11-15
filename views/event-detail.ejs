@@ -1,0 +1,38 @@
+<%- include('partials/header') %>
+
+<!-- Main Content -->
+<div class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="max-w-3xl mx-auto">
+        
+        <!-- Event Header -->
+        <div class="mb-8">
+            <span class="text-sm text-brand-green font-bold uppercase"><%= event.date %> | <%= event.location %></span>
+            <h1 class="text-4xl lg:text-5xl font-extrabold text-brand-dark dark:text-white mt-2 mb-4">
+                <%= event.title %>
+            </h1>
+        </div>
+
+        <!-- Event Content -->
+        <div class="prose prose-lg max-w-none text-gray-700 text-lg leading-relaxed dark:text-gray-300" style="white-space: pre-wrap;">
+            <%= event.description %>
+        </div>
+        
+        <!-- YEH BUTTON UPDATE HUA HAI -->
+        <div class="mt-8">
+            <!-- 'href' ab dynamic hai aur naye tab mein khulega -->
+            <a href="<%= event.applyLink %>" target="_blank" rel="noopener noreferrer" class="inline-block w-auto bg-brand-green hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg transition-all btn-gradient">
+                Register for this Event
+            </a>
+        </div>
+
+        <!-- Back Button -->
+        <div class="mt-12 border-t border-gray-200 dark:border-gray-700 pt-8">
+            <a href="/" class="font-bold text-brand-dark dark:text-gray-200 hover:text-brand-green transition-colors">
+                &larr; Back to Homepage
+            </a>
+        </div>
+
+    </div>
+</div>
+
+<%- include('partials/footer') %>

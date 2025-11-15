@@ -1,0 +1,55 @@
+<!-- Footer (YEH UPDATE HUA HAI) -->
+    <footer class="bg-gray-100 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 mt-16">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h1 class="text-3xl font-extrabold gradient-text">SustainWire</h1>
+                    <p class="text-gray-500 dark:text-gray-400 mt-2 text-sm">Your daily source for ESG news, jobs, and insights.</p>
+                </div>
+                <div>
+                    <h5 class="font-bold text-gray-900 dark:text-white mb-3">Quick Links</h5>
+                    <ul class="space-y-2">
+                        <li><a href="/" class="text-gray-600 dark:text-gray-300 hover:text-brand-green">Home</a></li>
+                        <li><a href="#" class="text-gray-600 dark:text-gray-300 hover:text-brand-green">About Us</a></li>
+                        <li><a href="#" class="text-gray-600 dark:text-gray-300 hover:text-brand-green">Contact</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h5 class="font-bold text-gray-900 dark:text-white mb-3">Categories</h5>
+                    <ul class="space-y-2">
+                        <li><a href="/news" class="text-gray-600 dark:text-gray-300 hover:text-brand-green">News</a></li>
+                        <li><a href="/jobs" class="text-gray-600 dark:text-gray-300 hover:text-brand-green">Jobs</a></li>
+                        <li><a href="/events" class="text-gray-600 dark:text-gray-300 hover:text-brand-green">Events</a></li>
+                        <li><a href="/courses" class="text-gray-600 dark:text-gray-300 hover:text-brand-green">Courses</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h5 class="font-bold text-gray-900 dark:text-white mb-3">Subscribe</h5>
+                    <p class="text-gray-600 dark:text-gray-400 text-sm mb-3">Get the latest news delivered to your inbox.</p>
+                    <input type="email" placeholder="Your email" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brand-green dark:bg-gray-800 dark:border-gray-600 dark:text-white">
+                </div>
+            </div>
+            <div class="border-t border-gray-200 dark:border-gray-700 mt-8 pt-8 text-center text-gray-500 dark:text-gray-400 text-sm">
+                &copy; 2025 SustainWire. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <!-- YEH NAYA ADD HUA HAI (Theme toggle ka logic) -->
+    <script>
+        const themeToggleBtn = document.getElementById('theme-toggle');
+
+        themeToggleBtn.addEventListener('click', function() {
+            // 'dark' class ko html tag par toggle karo
+            document.documentElement.classList.toggle('dark');
+
+            // preference ko localStorage mein save karo
+            if (document.documentElement.classList.contains('dark')) {
+                localStorage.theme = 'dark';
+            } else {
+                localStorage.theme = 'light';
+            }
+        });
+    </script>
+</body>
+</html>
